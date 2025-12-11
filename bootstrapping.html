@@ -29,7 +29,7 @@
 <body>
 
 <h2>Random Forest Bootstrap Sampling Demo</h2>
-<p>Click "Sample Trees" to randomly assign data (with replacement) to 3 trees (~2/3 of data will appear as ).</p>
+<p>Click "Sample Trees" to randomly assign data (with replacement) to 3 trees (~2/3 of the data will appear in the tree and the rest will be duplicates).</p>
 
 <h3>Original Dataset</h3>
 <div id="dataset" class="dataset"></div>
@@ -111,7 +111,7 @@ document.getElementById("sampleButton").onclick = () => {
   clearTrees();
 
   const n = samples.length;
-  const treeSize = Math.round(n * 2/3);
+  const treeSize = Math.round(n);
 
   const tree1Samples = bootstrapSample(samples, treeSize);
   const tree2Samples = bootstrapSample(samples, treeSize);
