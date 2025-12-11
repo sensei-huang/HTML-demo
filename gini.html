@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Gini Impurity</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js">
+  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);">
+  </script>
+
+<style>
+    body { font-family: sans-serif; margin: 20px; }
+
+    .slider-row { margin-bottom: 20px; }
+    .math { margin-top: 10px; }
+    .value-box { margin-left: 10px; font-weight: bold; }
+
+    /* Base slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 300px;
+      height: 12px;
+      border-radius: 6px;
+      background: #ccc;
+      outline: none;
+    }
+
+    /* Handle */
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #444;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #444;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  </style>
+
+</head>
+<body>
+<h2>Gini Impurity</h2>
+<p>Gini impurity is defined as: \( G = 1 - \sum_{i=1}^{n} p_i^2 \)</p>
+<p>Where \(p_i\) is the probability of \(i\) in a subset of values ranging from \(1\) to \(n\).</p>
+<p>In this example, there are only 2 probabilities where \(p_1\) is represented by blue and \(p_2\) is represented by red:</p>
+
+<!-- Slider -->
+  <div class="slider-row">
+    <label>\(p_1\) (blue) / \(p_2\) (red): </label><br>
+    <input type="range" id="p1" min="0" max="100" value="50">
+  </div>
+
+  <!-- Math output -->
+  <div class="math" id="pSquares"></div>
+  <div class="math" id="gini"></div>
+
+<br><br><br>
+<img src="https://images.ctfassets.net/x78yjrjc11pq/6DuY6QCQI9FZoy4vRISinm/b6b86b5b25e20f0ce1690d22878bd89d/14-2.png" width="650"></img>
+
+<script>
+function update() {
+  const slider = document.getElementById("p1");
+  const p1 = Number(slider.value) / 100;
+  const p2 = 1 - p1;
+
+  // Update slider track gradient (blue → red)
+  slider.style.background = `linear-gradient(
+    to right,
+    #4A90E2 0%,
+    #4A90E2 ${p1 * 100}%,
+    #E24A4A ${p1 * 100}%,
+    #E24A4A 100%
+  )`;
+
+  // Compute squares and gini
+  const p1sq = (p1 * p1).toFixed(2);
+  const p2sq = (p2 * p2).toFixed(2);
+  const gini = (1 - (p1*p1 + p2*p2)).toFixed(2);
+
+  // Render math
+  katex.render(
+    String.raw`\begin{aligned}
+      p_1 &= ${p1.toFixed(2)}\qquad
+      p_2 &= ${p2.toFixed(2)}\\
+      p_1^2 &= ${p1sq} \qquad
+      p_2^2 &= ${p2sq}
+    \end{aligned}`,
+    document.getElementById("pSquares"),
+    { throwOnError: false, displayMode: false }
+  );
+
+  katex.render(
+    String.raw`G = 1 - (p_1^2 + p_2^2) = \underline{${gini}}`,
+    document.getElementById("gini"),
+    { throwOnError: false, displayMode: false }
+  );
+}
+
+// Hook slider
+document.getElementById("p1").oninput = update;
+
+// Initial paint
+window.onload = update;
+</script>
+</body>
+</html>
