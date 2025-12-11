@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Decision Tree Split Gini Demo</title>
+
+  <!-- KaTeX from cdnjs -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js">
+  </script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 25px;
+    }
+    .sample {
+      padding: 4px;
+      margin-bottom: 3px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+    .classA { background: #4A90E2; color: white; }
+    .classB { background: #E24A4A; color: white; }
+    .column {
+      float: left;
+      margin-right: 40px;
+    }
+    .math { margin-top: 10px; }
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Decision Tree Split Gini Demo</h2>
+
+  <p>This demo shows how a decision tree evaluates a single threshold on a feature.  
+     Samples are split into <strong>Left (≤ threshold)</strong> and <strong>Right (> threshold)</strong> groups, and each group’s Gini impurity is computed.</p>
+
+  <h3>Feature threshold:</h3>
+  <input type="range" id="threshold" min="0" max="10" step="0.1" value="5" style="width:300px;">
+  <span id="th_val"></span>
+
+  <h3>Samples</h3>
+  <p>Each sample has one feature value (x) and a class (A or B):</p>
+
+  <div id="samples"></div>
+
+  <hr>
+
+  <div class="clearfix">
+    <div class="column">
+      <h3>Left Node (x ≤ threshold)</h3>
+      <div id="leftNode"></div>
+      <div class="math" id="leftGini"></div>
+    </div>
+
+    <div class="column">
+      <h3>Right Node (x > threshold)</h3>
+      <div id="rightNode"></div>
+      <div class="math" id="rightGini"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <h3>Weighted Split Gini</h3>
+    <div class="math" id="weightedGini"></div>
+  </div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<script>
+/////////////////////////////////////////////////////
+// SAMPLE DATA
+/////////////////////////////////////////////////////
+const samples = [
+  { x: 1.2, y: "A" },
+  { x: 2.5, y: "A" },
+  { x: 3.1, y: "B" },
+  { x: 4.8, y: "B" },
+  { x: 6.0, y: "A" },
+  { x: 7.4, y: "A" },
+  { x: 8.8, y: "B" }
+];
+
+function renderSamples() {
+  const container = document.getElementById("samples");
+  container.innerHTML = "";
+  samples.forEach(s => {
+    const div = document.createElement("div");
+    div.className = `sample class${s.y}`;
+    div.textContent = `x=${s.x}, class=${s.y}`;
+    container.appendChild(div);
+  });
+}
+
+/////////////////////////////////////////////////////
+// Gini calculation
+/////////////////////////////////////////////////////
+function gini(group) {
+  if (group.length === 0) return 0;
+
+  let countA = group.filter(s => s.y === "A").length;
+  let countB = group.length - countA;
+
+  let pA = countA / group.length;
+  let pB = countB / group.length;
+
+  return 1 - (pA*pA + pB*pB);
+}
+
+/////////////////////////////////////////////////////
+// Main update function
+/////////////////////////////////////////////////////
+function update() {
+  const th = Number(document.getElementById("threshold").value);
+  document.getElementById("th_val").textContent = th.toFixed(2);
+
+  // Split groups
+  const left = samples.filter(s => s.x <= th);
+  const right = samples.filter(s => s.x > th);
+
+  // Display groups
+  const leftNode = document.getElementById("leftNode");
+  const rightNode = document.getElementById("rightNode");
+  leftNode.innerHTML = "";
+  rightNode.innerHTML = "";
+
+  left.forEach(s => {
+    const div = document.createElement("div");
+    div.className = `sample class${s.y}`;
+    div.textContent = `x=${s.x}, class=${s.y}`;
+    leftNode.appendChild(div);
+  });
+
+  right.forEach(s => {
+    const div = document.createElement("div");
+    div.className = `sample class${s.y}`;
+    div.textContent = `x=${s.x}, class=${s.y}`;
+    rightNode.appendChild(div);
+  });
+
+  // Compute Gini values
+  const gLeft = gini(left);
+  const gRight = gini(right);
+
+  // Weighted Gini
+  const n = samples.length;
+  const weighted = (left.length/n)*gLeft + (right.length/n)*gRight;
+
+  // Render math with KaTeX
+  katex.render(
+    `G_L = ${gLeft.toFixed(4)}`,
+    document.getElementById("leftGini"),
+    { throwOnError: false, displayMode: false }
+  );
+  katex.render(
+    `G_R = ${gRight.toFixed(4)}`,
+    document.getElementById("rightGini"),
+    { throwOnError: false, displayMode: false }
+  );
+  katex.render(
+    String.raw`
+      G_{\text{split}} 
+      = \frac{|L|}{N} G_L + \frac{|R|}{N} G_R 
+      = ${weighted.toFixed(4)}
+    `,
+    document.getElementById("weightedGini"),
+    { throwOnError: false, displayMode: false }
+  );
+}
+
+document.getElementById("threshold").oninput = update;
+window.onload = function() {
+  renderSamples();
+  update();
+};
+</script>
+
+</body>
+</html>
