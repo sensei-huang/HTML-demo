@@ -9,7 +9,7 @@
   onload="renderMathInElement(document.body);"></script>
 <style>
   body { font-family: sans-serif; padding: 20px; background: #f8f8f8; }
-  canvas { border: 1px solid #ccc; background: white; display: block; margin-bottom: 20px; }
+  canvas { border: 1px solid #ccc; background: white; display: inline-block; margin: 7px; }
   label { display: block; margin-top: 10px; }
   .value { font-weight: bold; }
 </style>
@@ -35,20 +35,21 @@ Both Re (cos) and Im (sin) dot products are visible</p>
 </label>
 
 <p>
-In this box, black is the signal while red is sin and blue is cos.
+In this box, <b>black</b> is the signal while <span style="color: blue;">blue</span> is cos and <span style="color: red;">red</span> is sin.
 </p>
-<canvas id="signalCanvas" width="600" height="180"></canvas>
+<canvas id="signalCanvas" width="1000" height="200"></canvas>
 <p>
-In the second box, red is the dot product of sin and the signal while blue is the dot product of cos and the signal.
+In the next two boxes, <span style="color: red;">red</span> is the dot product of sin and the signal while <span style="color: blue;">blue</span> is the dot product of cos and the signal.
 </p>
-<canvas id="productCanvas" width="600" height="180"></canvas>
+<canvas id="cosCanvas" width="500" height="180"></canvas>
+<canvas id="sinCanvas" width="500" height="180"></canvas>
 <p>
 
 <div id="formula"></div>
 
 
 <script>
-const N = 64;
+const N = 256;
 
 // Draw wave with zero line
 function drawWaveWithZero(ctx, arrList, colorList, offsetList) {
@@ -167,8 +168,10 @@ function update(){
   drawWaveWithZero(ctx1,[signal, cosk, sink],["black","blue","red"],[0,-40,40]);
 
   // Draw dot product waves: both xcos and xsin
-  let ctx2 = productCanvas.getContext("2d");
-  drawWaveShaded(ctx2,[xcos,xsin],["blue","red"]);
+  let ctx2 = cosCanvas.getContext("2d");
+  drawWaveShaded(ctx2,[xcos],["blue"]);
+  let ctx3 = sinCanvas.getContext("2d");
+  drawWaveShaded(ctx3,[xsin],["red"]);
 
   // Dynamic formula
   let formulaDiv = document.getElementById("formula");
